@@ -3,20 +3,18 @@
 'use strict';
 var world, scene, renderer;
 var camera, light, controls;
-var bldShape, bldBody,
+var bldShape,
 			ground, groundShape, groundBody, groundMat, groundGeo,
 			buildingMat, buildingGeo;
 
 const keys = [];
 
 var buildingProp = [];
-var xbuildingBodyArr = [];
-var ybuildingBodyArr = [];
-var xbuildingShapeArr = [];
-var ybuildingShapeArr = [];
+var buildingBodyArr = [];
+var buildingShapeArr = [];
 
-var buildingAmountx = 4;
-var buildingAmounty = 2;
+var buildingAmountx = 3;
+var buildingAmounty = 4;
 
 function initCannon() {
 	world = new CANNON.World();
@@ -27,82 +25,91 @@ function initCannon() {
 	//Add objects here
 
 	//Ground
-	groundShape = new CANNON.Plane();
-	groundBody = new CANNON.Body({
-		mass: 0,
-		shape: groundShape
-	});
-	world.addBody(groundBody);
+	{
+		groundShape = new CANNON.Plane();
+		groundBody = new CANNON.Body({
+			mass: 0,
+			shape: groundShape
+		});
+		world.addBody(groundBody);
+	}
 
 	//Building
 	for (var i = 0; i < buildingAmountx; i++) {
-		buildingProp[i] = new Building(0, 25, 25, Math.random()*50+50);
-		bldShape = new CANNON.Box(new CANNON.Vec3(
-			buildingProp[i].x,
-			buildingProp[i].y,
-			buildingProp[i].z
-		));
-		xbuildingBodyArr[i] = new CANNON.Body({
-			mass: 1,
-			shape: bldShape,
-			position: new CANNON.Vec3(2*i*buildingProp[i].x, 0, buildingProp[i].z)
-		});
-		world.addBody(xbuildingBodyArr[i]);
+		buildingProp[i] = [];
+		buildingBodyArr[i] = [];
+		for (var j = 0; j < buildingAmounty; j++) {
+			buildingProp[i][j] = new Building(0, 25, 25, Math.random()*50+50);
+			bldShape = new CANNON.Box(new CANNON.Vec3(buildingProp[i][j].x, buildingProp[i][j].y, buildingProp[i][j].z));
+			buildingBodyArr[i][j] = new CANNON.Body({
+				mass: 1,
+				shape: bldShape,
+				position: new CANNON.Vec3(buildingProp[i][j].x * i * 2, buildingProp[i][j].y * j * 2, buildingProp[i][j].z)
+			});
+			world.addBody(buildingBodyArr[i][j]);
+		}
 	}
 }
 
 function initThree() {
-	scene = new THREE.Scene();
+	//Scene elements
+	{
+		scene = new THREE.Scene();
 
-	//Add camera
-	camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight);
-	camera.position.set(0, -100, 100);
+		//Add camera
+		camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight);
+		camera.position.set(0, -100, 100);
 
-	//Add light sources
-	const directLight = new THREE.DirectionalLight(0xffffff, 0.7);
-	directLight.position.set(50, 50, 400);
-	light = new THREE.AmbientLight(0xaaaaaa);
-	scene.add(directLight);
-	scene.add(light);
+		//Add light sources
+		const directLight = new THREE.DirectionalLight(0xffffff, 0.7);
+		directLight.position.set(50, 50, 400);
+		light = new THREE.AmbientLight(0xaaaaaa);
+		scene.add(directLight);
+		scene.add(light);
+	}
 
 	//Ground
-	groundMat = new THREE.MeshPhongMaterial({
-		color: 0x666666,
-		side: THREE.Frontside
-	});
-	groundGeo = new THREE.PlaneGeometry(1000, 1000);
-	ground = new THREE.Mesh(groundGeo, groundMat);
-	// ground.position.z = 5;
-	scene.add(ground);
+	{
+		groundMat = new THREE.MeshPhongMaterial({
+			color: 0x666666,
+			side: THREE.Frontside
+		});
+		groundGeo = new THREE.PlaneGeometry(1000, 1000);
+		ground = new THREE.Mesh(groundGeo, groundMat);
+		// ground.position.z = 5;
+		scene.add(ground);
+	}
 
 	//Building
-		buildingMat = new THREE.MeshPhongMaterial({
-			color: 0xaaaaaa,
-			side: THREE.Frontside,
-			wireframe: true
-		});
-	for (var i = 0; i < buildingAmountx; i++) {
-		buildingGeo = new THREE.BoxGeometry(
-			2*buildingProp[i].x,
-			2*buildingProp[i].y,
-			2*buildingProp[i].z
-		);
-		xbuildingShapeArr[i] = new THREE.Mesh(buildingGeo, buildingMat);
-		scene.add(xbuildingShapeArr[i]);
-	}
-	//Renderer
-	renderer = new THREE.WebGLRenderer({
-		antialias: true
+	buildingMat = new THREE.MeshPhongMaterial({
+		color: 0xaaaaaa,
+		side: THREE.Frontside,
+		wireframe: true
 	});
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.setClearColor(0x0000ff, 0.2);
-	document.body.appendChild(renderer.domElement);
+	for (var i = 0; i < buildingAmountx; i++) {
+		buildingShapeArr[i] = [];
+		for (var j = 0; j < buildingAmounty; j++) {
+			buildingGeo = new THREE.BoxGeometry(buildingProp[i][j].x * 2, buildingProp[i][j].y * 2, buildingProp[i][j].z * 2);
+			buildingShapeArr[i][j] = new THREE.Mesh(buildingGeo, buildingMat);
+			scene.add(buildingShapeArr[i][j]);
+		}
+	}
 
-	//Orbital Controls for camera
-	controls = new THREE.OrbitControls(camera, renderer.domElement);
+	//Renderer
+	{
+		renderer = new THREE.WebGLRenderer({
+			antialias: true
+		});
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setClearColor(0x0000ff, 0.2);
+		document.body.appendChild(renderer.domElement);
 
-	// console.log(world.bodies);
-	// console.log(scene.children);
+		//Orbital Controls for camera
+		controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+		// console.log(world.bodies);
+		// console.log(scene.children);
+	}
 }
 
 function animate() {
@@ -119,8 +126,10 @@ function updatePhys() {
 	// 	scene.getObjectById
 	// }
 	for (var i = 0; i < buildingAmountx; i++) {
-		xbuildingShapeArr[i].position.copy(xbuildingBodyArr[i].position);
-		xbuildingShapeArr[i].quaternion.copy(xbuildingBodyArr[i].quaternion);
+		for (var j = 0; j < buildingAmounty; j++) {
+			buildingShapeArr[i][j].position.copy(buildingBodyArr[i][j].position);
+			buildingShapeArr[i][j].quaternion.copy(buildingBodyArr[i][j].quaternion);
+		}
 	}
 }
 
