@@ -1,0 +1,30 @@
+{
+  "name": "city-sim",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edzh/city-sim.git"
+  },
+  "author": "edzh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/edzh/city-sim/issues"
+  },
+  "homepage": "https://github.com/edzh/city-sim#readme",
+  "dependencies": {
+    "browser-sync": "^2.9.6",
+    "cannon": "^0.6.2",
+    "three.js": "^0.72.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^4.1.3",
+    "browser-sync": "^2.9.6",
+    "eslint": "^1.5.1",
+    "gulp": "^3.9.0"
+  }
+}
