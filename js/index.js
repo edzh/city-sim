@@ -124,8 +124,10 @@ function initScene() {
     var buildingSizex = 100;
     var buildingSizey = 100;
     var roadSize = 150;
-    var sidewalkSizex = buildingSizex * buildingAmountx;
-    var sidewalkSizey = buildingSizey * buildingAmounty;
+    var sidewalkSizex = buildingSizex * buildingAmountx * 1.125;
+    var sidewalkSizey = buildingSizey * buildingAmounty * 1.125;
+    // var sidewalkSizex = 20;
+    // var sidewalkSizey = 20;
 
     //Create building physics
     for (var i = 0; i < buildingAmountx; i++) {
@@ -151,11 +153,15 @@ function initScene() {
     sidewalkBody = new CANNON.Body({
       mass: 0,
       shape: sidewalkShape,
-      position: new CANNON.Vec3(buildingAmountx * buildingSizex, buildingAmountx * buildingSizey, 1)
+      position: new CANNON.Vec3(blockPosX * (buildingSizex + 450) + 100, blockPosY * (buildingSizey + 450) + 100, 1)
     });
-    sidewalkMat = new THREE.MeshPhongMaterial({color: 0xFFFFFFF});
-    sidewalkGeo = new THREE.BoxGeometry(sidewalkSizex * 2.25, sidewalkSizey * 2.25, 2);
+    sidewalkMat = new THREE.MeshPhongMaterial({
+      color: 0x8A5CE6,
+      // wireframe: true
+    });
+    sidewalkGeo = new THREE.BoxGeometry(sidewalkSizex * 2, sidewalkSizey * 2, 2);
     sidewalk = new THREE.Mesh(sidewalkGeo, sidewalkMat);
+    world.addBody(sidewalkBody);
     scene.add(sidewalk);
     sidewalk.position.copy(sidewalkBody.position);
     sidewalk.quaternion.copy(sidewalkBody.quaternion);
@@ -212,7 +218,7 @@ function animate() {
   // console.log(playerBody.position.z);
   // console.log(velocity.x + " " + velocity.y);
   // playerBody.velocity.mult(0.99, playerBody.velocity);
-  camera.position.set(playerBody.position.x, playerBody.position.y, playerBody.position.z + 100);
+  camera.position.set(playerBody.position.x, playerBody.position.y - 20, playerBody.position.z + 5);
   camera.lookAt(playerBody.position);
   renderer.render(scene, camera);
 
