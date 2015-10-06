@@ -4,7 +4,8 @@
 		"browser": true,
 		"es6": true
 	},
-	"ignore": {
-		"no-unused-vars"
+	"rules": {
+		"no-unused-vars": 0,
+    "no-undef": 0
 	}
 }
